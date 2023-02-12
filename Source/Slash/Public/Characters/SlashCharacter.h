@@ -32,9 +32,14 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Input)
 	class UInputAction* JumpAction;
 
+	UPROPERTY(EditAnywhere, Category = Input)
+	class UInputAction* EquipAction;
+
 	void Move(const FInputActionValue& Value);
 
 	void Look(const FInputActionValue& Value);
+
+	void EKeyPressed();
 
 public:	
 	// Called every frame
@@ -56,4 +61,11 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Hair)
 	UGroomComponent* Eyebrows;
+
+	UPROPERTY(VisibleInstanceOnly)
+	class AItem* OverlappingItem;
+
+public:
+
+	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
 };
