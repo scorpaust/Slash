@@ -36,11 +36,31 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Input)
 	class UInputAction* EquipAction;
 
+	UPROPERTY(EditAnywhere, Category = Input)
+	class UInputAction* AttackAction;
+
+	/**
+	* Callbacks for input
+	*/
+
 	void Move(const FInputActionValue& Value);
 
 	void Look(const FInputActionValue& Value);
 
 	void EKeyPressed();
+
+	void Attack();
+
+	/**
+	* Play Montage Functions
+	*/
+
+	void PlayAttackMontage();
+
+	UFUNCTION(BlueprintCallable)
+	void AttackEnd();
+
+	bool CanAttack();
 
 public:	
 	// Called every frame
@@ -52,6 +72,9 @@ public:
 private:
 
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
+
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	EActionState ActionState = EActionState::EAS_Unoccupied;
 
 	UPROPERTY(VisibleAnywhere)
 	class USpringArmComponent* CameraBoom;
@@ -67,6 +90,13 @@ private:
 
 	UPROPERTY(VisibleInstanceOnly)
 	class AItem* OverlappingItem;
+
+	/**
+	* Animation Montages
+	*/
+
+	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	class UAnimMontage* AttackMontage;
 
 public:
 
