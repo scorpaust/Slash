@@ -57,10 +57,16 @@ protected:
 
 	void PlayAttackMontage();
 
+	void PlayEquipMontage(FName SectionName);
+
 	UFUNCTION(BlueprintCallable)
 	void AttackEnd();
 
 	bool CanAttack();
+
+	bool CanDisarm();
+
+	bool CanArm();
 
 public:	
 	// Called every frame
@@ -91,12 +97,18 @@ private:
 	UPROPERTY(VisibleInstanceOnly)
 	class AItem* OverlappingItem;
 
+	UPROPERTY(VisibleAnywhere, Category = Weapon)
+	class AWeapon* EquippedWeapon;
+
 	/**
 	* Animation Montages
 	*/
 
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
 	class UAnimMontage* AttackMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	UAnimMontage* EquipMontage;
 
 public:
 
