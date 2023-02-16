@@ -68,6 +68,15 @@ protected:
 
 	bool CanArm();
 
+	UFUNCTION(BlueprintCallable)
+	void Disarm();
+
+	UFUNCTION(BlueprintCallable)
+	void Arm();
+
+	UFUNCTION(BlueprintCallable)
+	void FinishEquipping();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -77,9 +86,10 @@ public:
 
 private:
 
+	UPROPERTY(VisibleAnywhere)
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
 
-	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	EActionState ActionState = EActionState::EAS_Unoccupied;
 
 	UPROPERTY(VisibleAnywhere)
