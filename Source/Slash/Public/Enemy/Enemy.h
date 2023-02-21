@@ -48,6 +48,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = Sounds)
 	class USoundBase* HitSound;
 
+	UPROPERTY(EditAnywhere, Category = "Visual Effects")
+	class UParticleSystem* HitParticles;
+
 public:	
 
 };
