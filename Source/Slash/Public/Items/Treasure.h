@@ -22,4 +22,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Sounds)
 	class USoundBase* PickupSound;
+
+	UPROPERTY(EditAnywhere, Category = "Treasure Properties")
+	int32 Gold;
 };
