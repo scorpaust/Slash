@@ -38,6 +38,12 @@ protected:
 
 private:
 
+	UPROPERTY(VisibleAnywhere)
+	class UAttributeComponent* Attributes;
+
+	UPROPERTY(VisibleAnywhere)
+	class UHealthBarComponent* HealthBarWidget;
+
 	/**
 	* Animation Montages
 	*/
