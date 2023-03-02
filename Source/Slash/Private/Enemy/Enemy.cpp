@@ -11,6 +11,7 @@
 #include "HUD/HealthBarComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "AIController.h"
+#include "Perception/PawnSensingComponent.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -41,6 +42,12 @@ AEnemy::AEnemy()
 	bUseControllerRotationYaw = false;
 
 	bUseControllerRotationRoll = false;
+
+	PawnSensing = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensing"));
+
+	PawnSensing->SightRadius = 4000.f;
+
+	PawnSensing->SetPeripheralVisionAngle(45.f);
 }
 
 // Called when the game starts or when spawned
@@ -55,26 +62,11 @@ void AEnemy::BeginPlay()
 
 	EnemyController = Cast<AAIController>(GetController());
 
-	if (EnemyController && PatrolTarget)
+	MoveToTarget(PatrolTarget);
+
+	if (PawnSensing)
 	{
-		FAIMoveRequest MoveRequest;
-
-		MoveRequest.SetGoalActor(PatrolTarget);
-
-		MoveRequest.SetAcceptanceRadius(15.f);
-
-		FNavPathSharedPtr NavPath;
-
-		EnemyController->MoveTo(MoveRequest, &NavPath);
-
-		TArray<FNavPathPoint>& PathPoints = NavPath->GetPathPoints();
-
-		for (auto& Point : PathPoints)
-		{
-			const FVector& Location = Point.Location;
-
-			DrawDebugSphere(GetWorld(), Location, 12.f, 12.f, FColor::Green, false, 10.f);
-		}
+		PawnSensing->OnSeePawn.AddDynamic(this, &AEnemy::PawnSeen);
 	}
 }
 
@@ -83,68 +75,139 @@ void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (CombatTarget)
+	if (EnemyState > EEnemyState::EES_Patrolling)
 	{
-		const double DistanceToTarget = (CombatTarget->GetActorLocation() - GetActorLocation()).Size();
+		CheckCombatTarget();
+	}
+	else
+	{
+		CheckPatrolTarget();
+	}
+}
 
-		if (InTargetRange(CombatTarget, CombatRadius))
+void AEnemy::CheckPatrolTarget()
+{
+	if (InTargetRange(PatrolTarget, PatrolRadius))
+	{
+		PatrolTarget = ChoosePatrolTarget();
+
+		const float WaitTime = FMath::RandRange(WaitMin, WaitMax);
+
+		GetWorldTimerManager().SetTimer(
+			PatrolTimer,
+			this,
+			&AEnemy::PatrolTimerFinished,
+			WaitTime
+		);
+	}
+}
+
+void AEnemy::CheckCombatTarget()
+{
+	if (!InTargetRange(CombatTarget, CombatRadius))
+	{
+		//Outside combat radius, lose interest
+		CombatTarget = nullptr;
+
+		if (HealthBarWidget)
 		{
-			CombatTarget = nullptr;
+			HealthBarWidget->SetVisibility(false);
+		}
 
-			if (HealthBarWidget)
-			{
-				HealthBarWidget->SetVisibility(false);
-			}
+		EnemyState = EEnemyState::EES_Patrolling;
+
+		GetCharacterMovement()->MaxWalkSpeed = 125.f;
+
+		MoveToTarget(PatrolTarget);
+	}
+	else if (!InTargetRange(CombatTarget, AttackRadius) && EnemyState != EEnemyState::EES_Chasing)
+	{
+		// Outside attack range, chase character
+		EnemyState = EEnemyState::EES_Chasing;
+
+		GetCharacterMovement()->MaxWalkSpeed = 300.f;
+
+		MoveToTarget(CombatTarget);
+	}
+
+	else if (InTargetRange(CombatTarget, AttackRadius) && EnemyState != EEnemyState::EES_Attacking)
+	{
+		// Inside attack range, attack character
+		EnemyState = EEnemyState::EES_Attacking;
+	}
+}
+
+AActor* AEnemy::ChoosePatrolTarget()
+{
+	TArray<AActor*> ValidTargets;
+
+	for (AActor* Target : PatrolTargets)
+	{
+		if (Target != PatrolTarget)
+		{
+			ValidTargets.AddUnique(Target);
 		}
 	}
 
-	if (PatrolTarget && EnemyController)
+	const int32 NumPatrolTargets = ValidTargets.Num();
+
+	if (NumPatrolTargets > 0)
 	{
-		if (InTargetRange(PatrolTarget, PatrolRadius))
-		{
-			TArray<AActor*> ValidTargets;
+		const int32 TargetSelection = FMath::RandRange(0, NumPatrolTargets - 1);
 
-			for (AActor* Target : PatrolTargets)
-			{
-				if (Target != PatrolTarget)
-				{
-					ValidTargets.AddUnique(Target);
-				}
-			}
+		return ValidTargets[TargetSelection];
 
-			const int32 NumPatrolTargets = ValidTargets.Num();
-
-			if (NumPatrolTargets > 0)
-			{
-				const int32 TargetSelection = FMath::RandRange(0, NumPatrolTargets - 1);
-
-				AActor* Target = ValidTargets[TargetSelection];
-
-				PatrolTarget = Target;
-
-				FAIMoveRequest MoveRequest;
-
-				MoveRequest.SetGoalActor(PatrolTarget);
-
-				MoveRequest.SetAcceptanceRadius(15.f);
-
-				EnemyController->MoveTo(MoveRequest);
-			}
-
-			
-		}
 	}
+
+	return nullptr;
 }
 
 bool AEnemy::InTargetRange(AActor* Target, double Radius)
 {
+	if (Target == nullptr) return false;
+
 	const double DistanceToTarget = (Target->GetActorLocation() - GetActorLocation()).Size();
 
-	DRAW_SPHERE_SINGLE_FRAME(GetActorLocation());
-
-	DRAW_SPHERE_SINGLE_FRAME(Target->GetActorLocation());
-
 	return DistanceToTarget <= Radius;
+}
+
+void AEnemy::MoveToTarget(AActor* Target)
+{
+	if (EnemyController == nullptr || Target == nullptr) return;
+	
+	FAIMoveRequest MoveRequest;
+
+	MoveRequest.SetGoalActor(Target);
+
+	MoveRequest.SetAcceptanceRadius(15.f);
+
+	EnemyController->MoveTo(MoveRequest);
+}
+
+void AEnemy::PatrolTimerFinished()
+{
+	MoveToTarget(PatrolTarget);
+}
+
+void AEnemy::PawnSeen(APawn* SeenPawn)
+{
+	if (EnemyState == EEnemyState::EES_Chasing) return;
+
+	if (SeenPawn->ActorHasTag(FName("SlashCharacter")))
+	{
+		GetWorldTimerManager().ClearTimer(PatrolTimer);
+
+		GetCharacterMovement()->MaxWalkSpeed = 300.f;
+
+		CombatTarget = SeenPawn;
+		
+		if (EnemyState != EEnemyState::EES_Attacking)
+		{
+			EnemyState = EEnemyState::EES_Chasing;
+
+			MoveToTarget(CombatTarget);
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -317,6 +380,12 @@ float AEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEv
 	}
 
 	CombatTarget = EventInstigator->GetPawn();
+
+	EnemyState = EEnemyState::EES_Chasing;
+
+	GetCharacterMovement()->MaxWalkSpeed = 300.f;
+
+	MoveToTarget(CombatTarget);
 
 	return DamageAmount;
 }
