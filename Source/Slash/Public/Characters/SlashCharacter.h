@@ -3,19 +3,25 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "BaseCharacter.h"
 #include "InputActionValue.h"
 #include "CharacterTypes.h"
 #include "SlashCharacter.generated.h"
 
 UCLASS()
-class SLASH_API ASlashCharacter : public ACharacter
+class SLASH_API ASlashCharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
 	ASlashCharacter();
+
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 protected:
 	// Called when the game starts or when spawned
@@ -49,20 +55,19 @@ protected:
 
 	void EKeyPressed();
 
-	void Attack();
+	virtual void Attack() override;
 
 	/**
 	* Play Montage Functions
 	*/
 
-	void PlayAttackMontage();
+	virtual void PlayAttackMontage() override;
 
 	void PlayEquipMontage(const FName& SectionName);
 
-	UFUNCTION(BlueprintCallable)
-	void AttackEnd();
+	virtual void AttackEnd() override;
 
-	bool CanAttack();
+	virtual bool CanAttack() override;
 
 	bool CanDisarm();
 
@@ -76,16 +81,6 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void FinishEquipping();
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	UFUNCTION(BlueprintCallable)
-	void SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
 
 private:
 
@@ -109,16 +104,6 @@ private:
 
 	UPROPERTY(VisibleInstanceOnly)
 	class AItem* OverlappingItem;
-
-	UPROPERTY(VisibleAnywhere, Category = Weapon)
-	class AWeapon* EquippedWeapon;
-
-	/**
-	* Animation Montages
-	*/
-
-	UPROPERTY(EditDefaultsOnly, Category = Montages)
-	class UAnimMontage* AttackMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
 	UAnimMontage* EquipMontage;
