@@ -4,6 +4,7 @@
 #include "Items/Item.h"
 #include "Slash/DebugMacros.h"
 #include "Components/SphereComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Characters/SlashCharacter.h"
 #include "NiagaraComponent.h"
 
@@ -13,6 +14,16 @@ AItem::AItem()
 	PrimaryActorTick.bCanEverTick = true;
 
 	ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemMeshComponent"));
+
+	ItemMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+
+	ItemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	ItemSkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("ItemSkeletalMeshComponent"));
+
+	ItemSkeletalMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+
+	ItemSkeletalMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	RootComponent = ItemMesh;
 
