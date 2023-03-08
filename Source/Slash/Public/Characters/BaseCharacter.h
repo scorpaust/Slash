@@ -48,8 +48,12 @@ protected:
 
 	virtual bool CanAttack();
 
+	bool IsAlive();
+
 	UFUNCTION(BlueprintCallable)
 	virtual void AttackEnd();
+
+	virtual void HandleDamage(float DamageAmount);
 
 	/**
 	* Play Montage Functions
@@ -73,6 +77,16 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
 	UAnimMontage* DeathMontage;
+
+	/**
+	* SFX / VFX
+	*/
+
+	void PlayHitSound(const FVector& ImpactPoint);
+
+	void SpawnHitParticles(const FVector& ImpactPoint);
+
+private:
 
 	/**
 	* SFX / VFX
