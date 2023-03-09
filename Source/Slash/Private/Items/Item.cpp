@@ -19,13 +19,15 @@ AItem::AItem()
 
 	ItemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	RootComponent = ItemMesh;
+
 	ItemSkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("ItemSkeletalMeshComponent"));
 
 	ItemSkeletalMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 
 	ItemSkeletalMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	RootComponent = ItemMesh;
+	ItemSkeletalMesh->SetupAttachment(GetRootComponent());
 
 	Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
 

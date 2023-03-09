@@ -45,7 +45,10 @@ protected:
 	void PawnSeen(APawn* SeenPawn);
 
 	UPROPERTY(BlueprintReadOnly)
-	EDeathPose DeathPose;
+	TEnumAsByte<EDeathPose> DeathPose;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	float DeathLifeSpan = 8.f;
 
 	UPROPERTY(BlueprintReadOnly)
 	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
@@ -64,7 +67,8 @@ protected:
 	* Play Montage Functions
 	*/
 
-	virtual void PlayAttackMontage() override;
+	virtual int32 PlayDeathMontage() override;
+
 
 private:
 
