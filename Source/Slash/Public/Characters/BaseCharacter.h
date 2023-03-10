@@ -16,20 +16,18 @@ public:
 	// Sets default values for this character's properties
 	ABaseCharacter();
 	
-	// Called every frame
+	// Called every frame <AActor>
 	virtual void Tick(float DeltaTime) override;
+	// </AActor>
 
-	UFUNCTION(BlueprintCallable)
-	void SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
-
+	// <IHitInterface>
 	virtual void GetHit_Implementation(const FVector& ImpactPoint) override;
+	// </IHitInterface>
 
 protected:
-	// Called when the game starts or when spawned
+	// Called when the game starts or when spawned <AActor>
 	virtual void BeginPlay() override;
-
-	UPROPERTY(VisibleAnywhere, Category = Weapon)
-	class AWeapon* EquippedWeapon;
+	// </AActor>
 
 	/**
 	* Components
@@ -38,22 +36,17 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	class UAttributeComponent* Attributes;
 
-	/**
-	* Attack Functions
+	/*
+	* Weapon
 	*/
 
-	virtual void Attack();
-
-	virtual void Die();
-
-	virtual bool CanAttack();
-
-	bool IsAlive();
+	UPROPERTY(VisibleAnywhere, Category = Weapon)
+	class AWeapon* EquippedWeapon;
 
 	UFUNCTION(BlueprintCallable)
-	virtual void AttackEnd();
+	void SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
 
-	virtual void HandleDamage(float DamageAmount);
+	void DisableCapsule();
 
 	/**
 	* Play Montage Functions
@@ -63,13 +56,65 @@ protected:
 
 	virtual int32 PlayDeathMontage();
 
+	void PlayHitReactMontage(const FName& SectionName);
+
+	/**
+	* SFX / VFX
+	*/
+
+	void PlayHitSound(const FVector& ImpactPoint);
+
+	void SpawnHitParticles(const FVector& ImpactPoint);
+
+	/**
+	* Attack Functions
+	*/
+
+	virtual bool CanAttack();
+
+	bool IsAlive();
+
+	virtual void Attack();
+
+	virtual void Die();
+
+	virtual void HandleDamage(float DamageAmount);
+
+	void DirectionalHitReact(const FVector& ImpactPoint);
+
+	UFUNCTION(BlueprintCallable)
+	virtual void AttackEnd();	
+
+	/**
+	* Montage Sections
+	*/
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	TArray<FName> AttackMontageSections;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	TArray<FName> DeathMontageSections;
+
+	
+private:
+
+	/**
+	* Montage Functions
+	*/
+
 	void PlayMontageSection(UAnimMontage* Montage, const FName& SectionName);
 
 	int32 PlayRandomMontageSection(UAnimMontage* Montage, const TArray<FName>& SectionNames);
 
-	void PlayHitReactMontage(const FName& SectionName);
+	/**
+	* SFX / VFX
+	*/
 
-	void DirectionalHitReact(const FVector& ImpactPoint);
+	UPROPERTY(EditAnywhere, Category = Sounds)
+	class USoundBase* HitSound;
+
+	UPROPERTY(EditAnywhere, Category = "Visual Effects")
+	class UParticleSystem* HitParticles;
 
 	/**
 	* Animation Montages
@@ -83,36 +128,4 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
 	UAnimMontage* DeathMontage;
-
-	void DisableCapsule();
-
-	/**
-	* Montage Sections
-	*/
-
-	UPROPERTY(EditAnywhere, Category = Combat)
-	TArray<FName> AttackMontageSections;
-
-	UPROPERTY(EditAnywhere, Category = Combat)
-	TArray<FName> DeathMontageSections;
-
-	/**
-	* SFX / VFX
-	*/
-
-	void PlayHitSound(const FVector& ImpactPoint);
-
-	void SpawnHitParticles(const FVector& ImpactPoint);
-
-private:
-
-	/**
-	* SFX / VFX
-	*/
-
-	UPROPERTY(EditAnywhere, Category = Sounds)
-	class USoundBase* HitSound;
-
-	UPROPERTY(EditAnywhere, Category = "Visual Effects")
-	class UParticleSystem* HitParticles;
 };
