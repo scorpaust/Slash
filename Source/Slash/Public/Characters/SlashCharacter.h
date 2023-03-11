@@ -22,6 +22,8 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// </AActor>
 
+	virtual void GetHit_Implementation(const FVector& ImpactPoint) override;
+
 protected:
 
 	// Called when the game starts or when spawned <AActor>

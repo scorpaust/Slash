@@ -110,22 +110,22 @@ private:
 	* SFX / VFX
 	*/
 
-	UPROPERTY(EditAnywhere, Category = Sounds)
+	UPROPERTY(EditAnywhere, Category = Combat)
 	class USoundBase* HitSound;
 
-	UPROPERTY(EditAnywhere, Category = "Visual Effects")
+	UPROPERTY(EditAnywhere, Category = Combat)
 	class UParticleSystem* HitParticles;
 
 	/**
 	* Animation Montages
 	*/
 
-	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	UPROPERTY(EditDefaultsOnly, Category = Combat)
 	class UAnimMontage* AttackMontage;
 
-	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	UPROPERTY(EditDefaultsOnly, Category = Combat)
 	UAnimMontage* HitReactMontage;
 
-	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	UPROPERTY(EditDefaultsOnly, Category = Combat)
 	UAnimMontage* DeathMontage;
 };

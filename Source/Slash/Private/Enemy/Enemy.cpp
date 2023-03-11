@@ -100,6 +100,8 @@ void AEnemy::BeginPlay()
 	Super::BeginPlay();
 	
 	InitializeEnemy();
+	
+	Tags.Add(FName("Enemy"));
 }
 
 void AEnemy::SpawnDefaultWeapon()
@@ -386,7 +388,7 @@ void AEnemy::MoveToTarget(AActor* Target)
 
 void AEnemy::PawnSeen(APawn* SeenPawn)
 {
-	const bool bShouldChaseTarget = EnemyState != EEnemyState::EES_Chasing && EnemyState != EEnemyState::EES_Dead && EnemyState < EEnemyState::EES_Attacking&& SeenPawn->ActorHasTag(FName("SlashCharacter"));
+	const bool bShouldChaseTarget = EnemyState != EEnemyState::EES_Chasing && EnemyState != EEnemyState::EES_Dead && EnemyState < EEnemyState::EES_Attacking&& SeenPawn->ActorHasTag(FName("EngageableTarget"));
 
 	if (bShouldChaseTarget)
 	{
