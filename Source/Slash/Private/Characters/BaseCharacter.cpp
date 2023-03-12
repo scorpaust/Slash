@@ -25,7 +25,6 @@ ABaseCharacter::ABaseCharacter()
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -156,7 +155,16 @@ void ABaseCharacter::SpawnHitParticles(const FVector& ImpactPoint)
 
 void ABaseCharacter::GetHit_Implementation(const FVector& ImpactPoint)
 {
+	if (IsAlive())
+	{
+		DirectionalHitReact(ImpactPoint);
+	}
 
+	else Die();
+
+	PlayHitSound(ImpactPoint);
+
+	SpawnHitParticles(ImpactPoint);
 }
 
 void ABaseCharacter::DirectionalHitReact(const FVector& ImpactPoint)
