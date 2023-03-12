@@ -78,11 +78,13 @@ void AEnemy::Destroyed()
 	}
 }
 
-void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
+void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 {
-	Super::GetHit_Implementation(ImpactPoint);
+	Super::GetHit_Implementation(ImpactPoint, Hitter);
 
-	ShowHealthBar();
+	if (!IsDead()) ShowHealthBar();
+
+	ClearPatrolTimer();
 }
 
 // Called when the game starts or when spawned
@@ -124,6 +126,8 @@ void AEnemy::Die()
 	SetLifeSpan(DeathLifeSpan);
 
 	GetCharacterMovement()->bOrientRotationToMovement = false;
+
+	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void AEnemy::Attack()
