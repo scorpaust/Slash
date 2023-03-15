@@ -65,7 +65,15 @@ float AEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEv
 
 	CombatTarget = EventInstigator->GetPawn();
 
-	ChaseTarget();
+	if (IsInsideAttackRadius())
+	{
+		EnemyState = EEnemyState::EES_Attacking;
+	}
+
+	else if (IsOutsideAttackRadius())
+	{
+		ChaseTarget();
+	}
 
 	return DamageAmount;
 }
@@ -85,6 +93,12 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 	if (!IsDead()) ShowHealthBar();
 
 	ClearPatrolTimer();
+
+	ClearAttackTimer();
+
+	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	StopAttackMontage();
 }
 
 // Called when the game starts or when spawned

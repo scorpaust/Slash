@@ -58,6 +58,8 @@ protected:
 
 	void PlayHitReactMontage(const FName& SectionName);
 
+	void StopAttackMontage();
+
 	/**
 	* SFX / VFX
 	*/
