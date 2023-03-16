@@ -61,6 +61,22 @@ protected:
 	void StopAttackMontage();
 
 	/**
+	* Motion Warping
+	*/
+	
+	UFUNCTION(BlueprintCallable)
+	FVector GetTranslationWarpTarget();
+
+	UFUNCTION(BlueprintCallable)
+	FVector GetRotationWarpTarget();
+
+	UPROPERTY(BlueprintReadOnly, Category = Combat)
+	AActor* CombatTarget;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	double WarpTargetDistance = 75.f;
+
+	/**
 	* SFX / VFX
 	*/
 
