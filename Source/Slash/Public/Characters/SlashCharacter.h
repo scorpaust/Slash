@@ -22,6 +22,8 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// </AActor>
 
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
 
 protected:
