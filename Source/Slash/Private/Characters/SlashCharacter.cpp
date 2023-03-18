@@ -13,6 +13,9 @@
 #include "Items/Weapons/Weapon.h"
 #include "Animation/AnimMontage.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/AttributeComponent.h"
+#include "HUD/SlashHUD.h"
+#include "HUD/SlashOverlay.h"
 
 // Sets default values
 ASlashCharacter::ASlashCharacter()
@@ -74,7 +77,7 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Look);
 
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Jump);
 
 		EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Triggered, this, &ASlashCharacter::EKeyPressed);
 
@@ -82,13 +85,22 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	}
 }
 
+void ASlashCharacter::Jump()
+{
+	if (IsUnoccupied())
+	{
+		Super::Jump();
+	}
+}
+
 float ASlashCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	HandleDamage(DamageAmount);
 
+	SetHUDHealth();
+
 	return DamageAmount;
 }
-
 
 void ASlashCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 {
@@ -114,6 +126,8 @@ void ASlashCharacter::BeginPlay()
 		{
 			Subsystem->AddMappingContext(SlashContext, 0);
 		}
+
+		InitializeSlashOverlay(PlayerController);
 	}
 
 	Tags.Add(FName("EngageableTarget"));
@@ -269,4 +283,38 @@ void ASlashCharacter::FinishEquipping()
 void ASlashCharacter::HitReactEnd()
 {
 	ActionState = EActionState::EAS_Unoccupied;
+}
+
+bool ASlashCharacter::IsUnoccupied()
+{
+	return ActionState == EActionState::EAS_Unoccupied;
+}
+
+void ASlashCharacter::InitializeSlashOverlay(APlayerController* PlayerController)
+{
+	ASlashHUD* SlashHUD = Cast<ASlashHUD>(PlayerController->GetHUD());
+
+	if (SlashHUD)
+	{
+		SlashOverlay = SlashHUD->GetSlashOverlay();
+
+		if (SlashOverlay && Attributes)
+		{
+			SlashOverlay->SetHealthBarPercent(Attributes->GetHealthPercent());
+
+			SlashOverlay->SetStaminaBarPercent(1.f);
+
+			SlashOverlay->SetGold(0);
+
+			SlashOverlay->SetSouls(0);
+		}
+	}
+}
+
+void ASlashCharacter::SetHUDHealth()
+{
+	if (SlashOverlay && Attributes)
+	{
+		SlashOverlay->SetHealthBarPercent(Attributes->GetHealthPercent());
+	}
 }

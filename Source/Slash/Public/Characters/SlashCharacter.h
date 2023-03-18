@@ -22,6 +22,8 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// </AActor>
 
+	virtual void Jump() override;
+
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
@@ -122,11 +124,22 @@ private:
 
 	/** Slash States */
 
+	bool IsUnoccupied();
+
 	UPROPERTY(VisibleAnywhere)
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	EActionState ActionState = EActionState::EAS_Unoccupied;
+
+	/** HUD / Overlay */
+
+	UPROPERTY()
+	class USlashOverlay* SlashOverlay;
+
+	void InitializeSlashOverlay(APlayerController* PlayerController);
+
+	void SetHUDHealth();
 
 public:
 
