@@ -108,7 +108,10 @@ void ASlashCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* 
 
 	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	ActionState = EActionState::EAS_HitReaction;
+	if (Attributes && Attributes->GetHealthPercent() > 0.f)
+	{
+		ActionState = EActionState::EAS_HitReaction;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -283,6 +286,15 @@ void ASlashCharacter::FinishEquipping()
 void ASlashCharacter::HitReactEnd()
 {
 	ActionState = EActionState::EAS_Unoccupied;
+}
+
+void ASlashCharacter::Die()
+{
+	Super::Die();
+
+	ActionState = EActionState::EAS_Dead;
+
+	DisableMeshCollision();
 }
 
 bool ASlashCharacter::IsUnoccupied()

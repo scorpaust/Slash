@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interfaces/HitInterface.h"
+#include "Characters/CharacterTypes.h"
 #include "BaseCharacter.generated.h"
 
 UCLASS()
@@ -103,6 +104,8 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	virtual void AttackEnd();	
 
+	void DisableMeshCollision();
+
 	/**
 	* Montage Sections
 	*/
@@ -113,6 +116,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Combat)
 	TArray<FName> DeathMontageSections;
 
+	UPROPERTY(BlueprintReadOnly)
+	TEnumAsByte<EDeathPose> DeathPose;
 	
 private:
 
@@ -146,4 +151,8 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = Combat)
 	UAnimMontage* DeathMontage;
+
+public:
+
+	FORCEINLINE TEnumAsByte<EDeathPose> GetDeathPose() const { return DeathPose; }
 };

@@ -46,7 +46,10 @@ void ABaseCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type Collision
 
 void ABaseCharacter::Attack()
 {
-	PlayAttackMontage();
+	if (CombatTarget && CombatTarget->ActorHasTag(FName("Dead")))
+	{
+		CombatTarget = nullptr;
+	}
 }
 
 void ABaseCharacter::PlayMontageSection(UAnimMontage* Montage, const FName& SectionName)
@@ -82,7 +85,16 @@ int32 ABaseCharacter::PlayAttackMontage()
 
 int32 ABaseCharacter::PlayDeathMontage()
 {
-	return PlayRandomMontageSection(DeathMontage, DeathMontageSections);
+	const int32 Selection = PlayRandomMontageSection(DeathMontage, DeathMontageSections);
+
+	TEnumAsByte<EDeathPose> Pose(Selection);
+
+	if (Pose < EDeathPose::EDP_MAX)
+	{
+		DeathPose = Pose;
+	}
+
+	return Selection;
 }
 
 void ABaseCharacter::DisableCapsule()
@@ -100,6 +112,11 @@ void ABaseCharacter::AttackEnd()
 
 }
 
+void ABaseCharacter::DisableMeshCollision()
+{
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
 void ABaseCharacter::HandleDamage(float DamageAmount)
 {
 	if (Attributes)
@@ -115,7 +132,9 @@ bool ABaseCharacter::IsAlive()
 
 void ABaseCharacter::Die()
 {
+	Tags.Add(FName("Dead"));
 
+	PlayDeathMontage();
 }
 
 void ABaseCharacter::PlayHitReactMontage(const FName& SectionName)

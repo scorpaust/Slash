@@ -98,6 +98,8 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void HitReactEnd();
 
+	virtual void Die() override;
+
 private:
 
 	/** Character Components */
@@ -145,5 +147,7 @@ public:
 
 	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
 
-	FORCEINLINE ECharacterState GetCharacterState() { return CharacterState; }
+	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
+
+	FORCEINLINE EActionState GetActionState() const { return ActionState; }
 };
