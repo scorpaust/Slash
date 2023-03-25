@@ -60,7 +60,7 @@ protected:
 	class USphereComponent* Sphere;
 
 	UPROPERTY(EditAnywhere, Category = "Visual Effects")
-	class UNiagaraComponent* EmbersEffect;
+	class UNiagaraComponent* ItemEffect;
 
 private:
 

@@ -6,10 +6,11 @@
 #include "BaseCharacter.h"
 #include "InputActionValue.h"
 #include "CharacterTypes.h"
+#include "Interfaces/PickupInterface.h"
 #include "SlashCharacter.generated.h"
 
 UCLASS()
-class SLASH_API ASlashCharacter : public ABaseCharacter
+class SLASH_API ASlashCharacter : public ABaseCharacter, public IPickupInterface
 {
 	GENERATED_BODY()
 
@@ -27,6 +28,10 @@ public:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
+
+	virtual void SetOverlappingItem(AItem* Item) override;
+
+	virtual void AddSouls(class ASoul* Soul) override;
 
 protected:
 
@@ -144,8 +149,6 @@ private:
 	void SetHUDHealth();
 
 public:
-
-	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
 
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
 
