@@ -38,7 +38,9 @@ protected:
 	void SpawnDefaultWeapon();
 
 	// Play death montage <ABaseCharacter>
-	virtual void Die() override; 
+	virtual void Die() override;
+	void SpawnSoul();
+
 
 	virtual void Attack() override;
 
@@ -157,4 +159,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	float DeathLifeSpan = 8.f;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	TSubclassOf<class ASoul> SoulClass;
 };

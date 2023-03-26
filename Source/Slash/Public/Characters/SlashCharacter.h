@@ -33,6 +33,8 @@ public:
 
 	virtual void AddSouls(class ASoul* Soul) override;
 
+	virtual void AddGold(class ATreasure* Treasure) override;
+
 protected:
 
 	// Called when the game starts or when spawned <AActor>
