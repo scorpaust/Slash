@@ -57,6 +57,8 @@ protected:
 
 	virtual int32 PlayDeathMontage();
 
+	virtual void PlayDodgeMontage();
+
 	void PlayHitReactMontage(const FName& SectionName);
 
 	void StopAttackMontage();
@@ -103,6 +105,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void AttackEnd();	
+
+	UFUNCTION(BlueprintCallable)
+	virtual void DodgeEnd();
 
 	void DisableMeshCollision();
 
@@ -151,6 +156,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = Combat)
 	UAnimMontage* DeathMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = Combat)
+	UAnimMontage* DodgeMontage;
 
 public:
 

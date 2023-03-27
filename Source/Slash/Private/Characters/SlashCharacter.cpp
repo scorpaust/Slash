@@ -23,7 +23,7 @@
 ASlashCharacter::ASlashCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	bUseControllerRotationPitch = false;
 
@@ -68,6 +68,16 @@ ASlashCharacter::ASlashCharacter()
 	Eyebrows->AttachmentName = FString("head");
 }
 
+void ASlashCharacter::Tick(float DeltaTime)
+{
+	if (Attributes && SlashOverlay)
+	{
+		Attributes->RegenStamina(DeltaTime);
+
+		SlashOverlay->SetStaminaBarPercent(Attributes->GetStaminaPercent());
+	}
+}
+
 // Called to bind functionality to input
 void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -84,6 +94,8 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Triggered, this, &ASlashCharacter::EKeyPressed);
 
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Attack);
+
+		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Dodge);
 	}
 }
 
@@ -227,6 +239,22 @@ void ASlashCharacter::Attack()
 	}
 }
 
+void ASlashCharacter::Dodge()
+{
+	if (IsOccupied() || !HasEnouthStamina()) return;
+
+	PlayDodgeMontage();
+
+	ActionState = EActionState::EAS_Dodge;
+
+	if (Attributes)
+	{
+		Attributes->UseStamina(Attributes->GetDodgeCost());
+
+		SlashOverlay->SetStaminaBarPercent(Attributes->GetStaminaPercent());
+	}
+}
+
 void ASlashCharacter::PlayEquipMontage(const FName& SectionName)
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -255,6 +283,12 @@ void ASlashCharacter::AttackEnd()
 	ActionState = EActionState::EAS_Unoccupied;
 }
 
+void ASlashCharacter::DodgeEnd()
+{
+	Super::DodgeEnd();
+
+	ActionState = EActionState::EAS_Unoccupied;
+}
 
 bool ASlashCharacter::CanAttack()
 {
@@ -322,6 +356,16 @@ void ASlashCharacter::Die()
 	ActionState = EActionState::EAS_Dead;
 
 	DisableMeshCollision();
+}
+
+bool ASlashCharacter::HasEnouthStamina()
+{
+	return Attributes && Attributes->GetStamina() > Attributes->GetDodgeCost();
+}
+
+bool ASlashCharacter::IsOccupied()
+{
+	return ActionState != EActionState::EAS_Unoccupied;
 }
 
 bool ASlashCharacter::IsUnoccupied()

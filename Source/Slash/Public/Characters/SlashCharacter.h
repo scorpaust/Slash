@@ -19,6 +19,8 @@ public:
 	// Sets default values for this character's properties
 	ASlashCharacter();
 
+	virtual void Tick(float DeltaTime) override;
+
 	// Called to bind functionality to input <AActor>
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// </AActor>
@@ -59,6 +61,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Input)
 	class UInputAction* AttackAction;
 
+	UPROPERTY(EditAnywhere, Category = Input)
+	class UInputAction* DodgeAction;
+
 	/**
 	* Callbacks for input
 	*/
@@ -71,6 +76,8 @@ protected:
 
 	virtual void Attack() override;
 
+	void Dodge();
+
 	/**
 	* Play Montage Functions
 	*/
@@ -82,6 +89,8 @@ protected:
 	void EquipWeapon(AWeapon* Weapon);
 
 	virtual void AttackEnd() override;
+
+	virtual void DodgeEnd() override;
 
 	virtual bool CanAttack() override;
 
@@ -106,6 +115,10 @@ protected:
 	void HitReactEnd();
 
 	virtual void Die() override;
+
+	bool HasEnouthStamina();
+
+	bool IsOccupied();
 
 private:
 
