@@ -22,6 +22,8 @@ AEnemy::AEnemy()
 
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
 
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+
 	GetMesh()->SetGenerateOverlapEvents(true);
 
 	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar"));
@@ -107,6 +109,8 @@ void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	if (PawnSensing) PawnSensing->OnSeePawn.AddDynamic(this, &AEnemy::PawnSeen);
+
 	InitializeEnemy();
 	
 	Tags.Add(FName("Enemy"));
@@ -120,7 +124,7 @@ void AEnemy::SpawnDefaultWeapon()
 	{
 		AWeapon* DefaultWeapon = World->SpawnActor<AWeapon>(WeaponClass);
 
-		DefaultWeapon->Equip(GetMesh(), FName("RightHandSocket"), this, this);
+		DefaultWeapon->Equip(GetMesh(), FName("WeaponSocket"), this, this);
 
 		EquippedWeapon = DefaultWeapon;
 	}
@@ -207,8 +211,6 @@ void AEnemy::InitializeEnemy()
 
 	HideHealthBar();
 
-	if (PawnSensing) PawnSensing->OnSeePawn.AddDynamic(this, &AEnemy::PawnSeen);
-
 	SpawnDefaultWeapon();
 }
 
@@ -242,6 +244,8 @@ void AEnemy::CheckCombatTarget()
 
 	else if (IsOutsideAttackRadius() && !IsChasing())
 	{
+		ClearAttackTimer();
+
 		if (!IsEngaged()) ChaseTarget();
 	}
 
@@ -398,17 +402,19 @@ void AEnemy::MoveToTarget(AActor* Target)
 
 	MoveRequest.SetGoalActor(Target);
 
-	MoveRequest.SetAcceptanceRadius(60.f);
+	MoveRequest.SetAcceptanceRadius(AcceptanceRadius);
 
 	EnemyController->MoveTo(MoveRequest);
 }
 
 void AEnemy::PawnSeen(APawn* SeenPawn)
 {
-	const bool bShouldChaseTarget = EnemyState != EEnemyState::EES_Chasing && EnemyState != EEnemyState::EES_Dead && EnemyState < EEnemyState::EES_Attacking&& SeenPawn->ActorHasTag(FName("EngageableTarget"));
+	const bool bShouldChaseTarget = EnemyState != EEnemyState::EES_Chasing && EnemyState != EEnemyState::EES_Dead && EnemyState < EEnemyState::EES_Attacking && SeenPawn->ActorHasTag(FName("EngageableTarget"));
 
 	if (bShouldChaseTarget)
 	{
+		CombatTarget = SeenPawn;
+		
 		ClearPatrolTimer();
 
 		ChaseTarget();
