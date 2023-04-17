@@ -38,7 +38,7 @@ protected:
 	void SpawnDefaultWeapon();
 
 	// Play death montage <ABaseCharacter>
-	virtual void Die() override;
+	virtual void Die_Implementation() override;
 	void SpawnSoul();
 
 

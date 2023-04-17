@@ -349,9 +349,9 @@ void ASlashCharacter::HitReactEnd()
 	ActionState = EActionState::EAS_Unoccupied;
 }
 
-void ASlashCharacter::Die()
+void ASlashCharacter::Die_Implementation()
 {
-	Super::Die();
+	Super::Die_Implementation();
 
 	ActionState = EActionState::EAS_Dead;
 

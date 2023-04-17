@@ -140,7 +140,7 @@ bool ABaseCharacter::IsAlive()
 	return Attributes && Attributes->IsAlive();
 }
 
-void ABaseCharacter::Die()
+void ABaseCharacter::Die_Implementation()
 {
 	Tags.Add(FName("Dead"));
 

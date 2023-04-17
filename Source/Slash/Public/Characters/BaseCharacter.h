@@ -97,7 +97,8 @@ protected:
 
 	virtual void Attack();
 
-	virtual void Die();
+	UFUNCTION(BlueprintNativeEvent)
+	void Die();
 
 	virtual void HandleDamage(float DamageAmount);
 

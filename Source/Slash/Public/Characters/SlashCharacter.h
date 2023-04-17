@@ -114,7 +114,7 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void HitReactEnd();
 
-	virtual void Die() override;
+	virtual void Die_Implementation() override;
 
 	bool HasEnouthStamina();
 

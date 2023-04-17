@@ -136,6 +136,8 @@ void AWeapon::BoxTrace(FHitResult& BoxHit)
 
 	ActorsToIgnore.Add(this);
 
+	ActorsToIgnore.Add(GetOwner());
+
 	for (AActor* Actor : IgnoreActors)
 	{
 		ActorsToIgnore.AddUnique(Actor);
